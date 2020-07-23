@@ -1,0 +1,103 @@
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/quotes.css') }}" rel="stylesheet">
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/4.0.0/material-components-web.min.css" />
+</head>
+
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='img/solartis-logo.webp') }}" width="200" />
+        <div class="header-right">
+            <a href="/">Create Quote</a>
+            <a class="active">Quotes History</a>
+        </div>
+    </div>
+
+    <div class="loader">
+        <img src="{{ url_for('static', filename='img/loader.gif') }}" />
+    </div>
+
+    <table id="quoteListTable" class="display" width="100%">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>FirstName</th>
+                <th>EmailAddress</th>
+                <th>City</th>
+                <th>Liability Coverage</th>
+                <th>PP Coverage</th>
+                <th>Personal Premium</th>
+                <th>Liability Premium</th>
+                <th>Total Premium</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+    </table>
+    <script>
+        $(document).ready(() => {
+            $('.loader').hide();
+            function setDataTable(quoteList) {
+                $('#quoteListTable').DataTable({
+                    order: [[ 0, "desc" ]],
+                    data: quoteList,
+                    columnDefs: [
+                        {
+                            targets: ['_all'],
+                            className: 'mdc-data-table__cell'
+                        }
+                    ],
+                    columns: [
+                        { "data": "Id" },
+                        { "data": "FirstName" },
+                        { "data": "EmailAddress" },
+                        { "data": "City" },
+                        { "data": "LCoverageValue" },
+                        { "data": "PPCoveragevalue" },
+                        { "data": "PersonalPremium" },
+                        { "data": "LiabilityPremium" },
+                        { "data": "TotalPremium" },
+                        {
+                            "render": function (data, type, full) {
+                                var id = full['Id'];
+                                return "<a href='/quote/" + id + "'>" + 'More Info' + '</a>';
+                            }
+                        },
+                        {
+                            "render": function (data, type, full) {
+                                var id = full['Id'];
+                                return "<a href='/quote/" + id + "/print'>" + 'Print' + '</a>';
+                            }
+                        }
+                    ]
+                });
+            }
+            $('.loader').show();
+            $('#quoteListTable').hide();
+            $.ajax({
+                url: '/api/quotes',
+                type: 'GET',
+                success: function (response) {
+                    $('.loader').hide();
+                    $('#quoteListTable').fadeIn(800);
+                    setDataTable(response);
+                },
+                error: function (error) {
+                    $('.loader').hide();
+                    $('#quoteListTable').show();
+                    console.log(error);
+                    alert("Failed to calculate Premium." + error);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

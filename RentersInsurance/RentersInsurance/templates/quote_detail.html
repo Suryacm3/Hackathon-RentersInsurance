@@ -1,0 +1,114 @@
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/quotedetail.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" text="text/css">
+</head>
+
+<body>
+    <div class="header">
+        <img src="https://www.solartis.com/hubfs/logos/solartis-logo.png" width="200" />
+        <div class="header-right">
+        </div>
+    </div>
+    <div style="padding: 16px;">
+        <div>
+            <span style="color:brown; float: left;font-size: 28px;">
+                {{ InsuranceType }} Insurance
+            </span>
+
+            <span style="float: right;font-size: 28px;">Quote # {{Id}}</span>
+        </div>
+        <div>
+            <table>
+                <tr>
+                    <td>Starting Date</td>
+                    <td>{{ PolicyStartDate }}</td>
+                </tr>
+                <tr>
+                    <td>First Name</td>
+                    <td>{{ FirstName }}</td>
+                </tr>
+                <tr>
+                    <td>Last Name</td>
+                    <td>{{ LastName }}</td>
+                </tr>
+                <tr>
+                    <td>Email Id</td>
+                    <td>{{  EmailAddress }}</td>
+                </tr>
+                <tr>
+                    <td>Phone Number</td>
+                    <td>{{ PhoneNumber }}</td>
+                </tr>
+                <tr>
+                    <td>Address Line 1</td>
+                    <td>{{ AddressLine1 }}</td>
+                </tr>
+                <tr>
+                    <td>Address Line 2</td>
+                    <td>{{ AddressLine2 }}</td>
+                </tr>
+                <tr>
+                    <td>City</td>
+                    <td>{{ City }}</td>
+                </tr>
+                <tr>
+                    <td>State</td>
+                    <td>{{ State }}</td>
+                </tr>
+                <tr>
+                    <td>Zip Code</td>
+                    <td>{{ Zip }}</td>
+                </tr>
+                <tr>
+                    <td>Plan</td>
+                    <td>{{ Plan }}</td>
+                </tr>
+                <tr>
+                    <td>Personal Property Coverage Value</td>
+                    <td>${{ PPCoveragevalue }}</td>
+                </tr>
+                <tr>
+                    <td>Building Type</td>
+                    <td>{{ BuildingType }}</td>
+                </tr>
+                <tr>
+                    <td>Deductible</td>
+                    <td>${{ Deductible }}</td>
+                </tr>
+                <tr>
+                    <td>Liability Coverage Value</td>
+                    <td>${{ LCoverageValue }}</td>
+                </tr>
+                <tr>
+                    <td>Age</td>
+                    <td>{{ Age }}</td>
+                </tr>
+            </table>
+            <br />
+            <table>
+                <tr>
+                    <td>Personal Property Premium</td>
+                    <td> <span>${{ PersonalPremium }}</span></td>
+                </tr>
+                <tr>
+                    <td>Liability Premium</td>
+                    <td> <span>${{ LiabilityPremium }}</span></td>
+                </tr>
+                <tr>
+                    <td>Total Premium</td>
+                    <td> <span style="font-size: 28px;">${{ TotalPremium }}</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+<script>
+
+
+</script>
+
+</html>

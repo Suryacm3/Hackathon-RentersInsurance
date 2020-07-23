@@ -1,0 +1,281 @@
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/rentersui.css') }}" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+</head>
+
+<body>
+  <div class="header">
+    <img src="{{ url_for('static', filename='img/solartis-logo.webp') }}" width="200" />
+    <div class="header-right">
+      <a class="active" href="#">Create Quote</a>
+      <a href="/quotes">Quotes History</a>
+    </div>
+  </div>
+  <form id="RentersForm" action="" method="POST">
+    <h1 id="createQuoteTitle">CREATE QUOTE</h1>
+    <h5 id="steps"></h5>
+    <div class="tab">
+      <h2>Policy Details</h2>
+      <br />
+      <label for="insuranceType">Insurance Type</label>
+      <select name="insuranceType" id="insuranceType">
+        <option>Renters</option>
+        <option>Home</option>
+        <option>Vehicle</option>
+      </select>
+      <label for="startingDate">Policy Starting Date</label>
+      <input type="date" id="startingDate" data-rule-optdate="true" data-rule-startDate="2020-07-21"
+        name="startingDate"></p>
+    </div>
+    <div class="tab">
+      <h2>Insured Details</h2>
+      <br />
+      <label for="fname">First Name</label>
+      <input placeholder="John" type="text" id="fname" name="fname">
+      <label for="lname">Last Name</label>
+      <input placeholder="Doe" name="lname" id="lname">
+      <label for="email">Email</label>
+      <input type="email" placeholder="user@example.org" id="email" name="email">
+      <label for="phone">Phone Number</label>
+      <input placeholder="ex. (541) 754-3010" id="phone" name="phone">
+      <label for="address1">Address Line 1</label>
+      <input id="address1" name="address1">
+      <label for="address2">Address Line 2 (Optional)</label>
+      <input id="address2" name="address2">
+      <label for="city">City</label>
+      <select id="city" name="city">
+        <option value="1">South Hampton</option>
+        <option value="2">Hampton</option>
+        <option value="3">Hoboken</option>
+        <option value="4">Weehawken</option>
+      </select>
+      <label for="state">State</label>
+      <select name="state" id="state">
+        <option>New York</option>
+        <option>New Jersey</option>
+      </select>
+      <label for="zip">Zip</label>
+      <input type="text" placeholder="ex. 10001" name="zip" id="zip">
+    </div>
+    <div class="tab">
+      <h2>Coverage Details</h2>
+      <br />
+      <label for="plan">Plan Type</label>
+      <select name="plan" id="plan">
+        <option>Standard</option>
+        <option>Preferred</option>
+      </select>
+      <label for="ppCoverageValue">Personal Property CoverageValue</label>
+      <input placeholder="ex. 50000" name="ppCoverageValue" id="ppCoverageValue">
+      <label for="buildingType">Building Type</label>
+      <select name="buildingType" id="buildingType">
+        <option>Frame</option>
+        <option>Brick</option>
+      </select>
+      <label for="deductible">Deductible</label>
+      <select name="deductible" id="deductible">
+        <option>100</option>
+        <option>250</option>
+        <option>500</option>
+      </select>
+      <label for="lCoverageValue">Liability Coverage Value</label>
+      <select name="lCoverageValue" id="lCoverageValue">
+        <option>100000</option>
+        <option>300000</option>
+        <option>500000</option>
+      </select>
+      <label for="age">Age</label>
+      <select name="age" id="age"></select>
+      <br />
+      <input type="button" id="CalculateQuote" value="Calculate My Quote" />
+    </div>
+    <div class="tab">
+      <br />
+      <p style="text-align: center;font-size: 18px;">Hi <span id="username"></span>! The premium for your house has been
+        calculated
+        successfully!</span></p>
+      <p style="font-size: 48px; font-weight: bold;text-align: center;"> $
+        <span id="totalPremium"></span>/yr</p>
+
+      <p><input type="button" value="Download Quote Proposal Document" id="QuoteDoc"></p>
+      <p><input type="button" value="Continue Purchase Policy" id="PurchasePolicy"></p>
+    </div>
+    <div>
+      <div>
+        <button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+        <button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:40px;">
+      <span class="step"></span>
+      <span class="step"></span>
+      <span class="step"></span>
+      <span class="step"></span>
+    </div>
+  </form>
+
+  <div class="loader">
+    <img src="{{ url_for('static', filename='img/loader.gif') }}" />
+  </div>
+
+  <script>
+    function objectifyForm(formArray) {
+      var returnArray = {};
+      for (var i = 0; i < formArray.length; i++) {
+        returnArray[formArray[i]['name']] = formArray[i]['value'];
+      }
+      return returnArray;
+    }
+    $(function () {
+      $('.loader').hide();
+      var quoteid;
+      $('#CalculateQuote').click(function () {
+        var jObject = objectifyForm($('#RentersForm').serializeArray());
+
+        $('.loader').show();
+        $.ajax({
+          url: '/api/calculatepremium',
+          data: JSON.stringify(jObject),
+          type: 'POST',
+          contentType: "application/json",
+          success: function (response) {
+            $('.loader').hide();
+            nextPrev(1);
+            $('#totalPremium').text(response.total_premium);
+            $('#username').text(jObject['fname']);
+            $('#quoteid').text(response.quoteId);
+            quoteid = response.quoteId;
+            console.log(response);
+          },
+          error: function (error) {
+            $('.loader').hide();
+            console.log(error);
+            alert("Failed to calculate Premium." + error);
+          }
+        });
+      });
+      $('#QuoteDoc').click(function () {
+        var loc = window.location.href + 'quote/' + quoteid + '/print';
+        window.open(loc, 'popUpWindow', 'height=400,width=600,left=10,top=10,,scrollbars=yes,menubar=no');
+        return false;
+      });
+      $('#PurchasePolicy').click(function () {
+        alert('Unable to proceed with policy creation');
+      });
+
+      $("form#RentersForm").validate({
+        rules: {
+          fname: "required",
+          lname: "required",
+          email: {
+            required: true,
+            email: true
+          },
+          phone: "required",
+          address1: "required",
+          zip: {
+            required: true,
+            digits: true
+          },
+          ppCoverageValue: {
+            required: true,
+            digits: true,
+            min: 50000
+          },
+          startingDate: {
+            date: true
+          }
+        },
+        messages: {
+          fname: "Please enter your firstname",
+          lname: "Please enter your lastname",
+          email: "Please enter a valid email address",
+          phone: "Please enter your phone number",
+          address1: "Please enter your address line 1",
+          zip: "Please enter a valid zip code",
+          startingDate: "Please select a valid date",
+          ppCoverageValue: "Please enter a valid personal property coverage value ( >= $50,000)",
+        },
+        submitHandler: function (form) {
+          form.submit();
+        }
+      });
+    });
+
+    var currentTab = 0;
+    showTab(currentTab);
+    var selectAge = document.getElementById("age");
+    var contents;
+    for (let i = 18; i <= 71; i++) {
+      contents += "<option>" + i + "</option>";
+    }
+    selectAge.innerHTML = contents;
+
+    function showTab(n) {
+      var steps = document.getElementById("steps");
+      var conts;
+      conts = "Step " + (n + 1) + " of 4";
+      steps.innerHTML = conts;
+      var x = document.getElementsByClassName("tab");
+      x[n].style.display = "block";
+      if (n == 0) {
+        document.getElementById("prevBtn").style.display = "none";
+      } else {
+        document.getElementById("prevBtn").style.display = "inline";
+      }
+      if (n == (x.length - 1)) {
+        $('#createQuoteTitle').hide();
+      }
+      if (n >= (x.length - 2)) {
+        document.getElementById("nextBtn").style.display = "none";
+      } else {
+        document.getElementById("nextBtn").style.display = "inline";
+      }
+      fixStepIndicator(n)
+    }
+
+    function nextPrev(n) {
+      var x = document.getElementsByClassName("tab");
+      if (n == 1 && !$("#RentersForm").valid()) return false;
+      x[currentTab].style.display = "none";
+      currentTab = currentTab + n;
+      if (currentTab >= x.length) {
+        document.getElementById("regForm").submit();
+        return false;
+      }
+      showTab(currentTab);
+    }
+
+    function validateForm() {
+      var x, y, i, valid = true;
+      x = document.getElementsByClassName("tab");
+      y = x[currentTab].getElementsByTagName("input");
+      for (i = 0; i < y.length; i++) {
+        if (y[i].value == "") {
+          y[i].className += " invalid";
+          valid = false;
+        }
+      }
+      if (valid) {
+        document.getElementsByClassName("step")[currentTab].className += " finish";
+      }
+      return valid;
+    }
+
+    function fixStepIndicator(n) {
+      var i, x = document.getElementsByClassName("step");
+      for (i = 0; i < x.length; i++) {
+        x[i].className = x[i].className.replace(" active", "");
+      }
+      x[n].className += " active";
+    }
+  </script>
+</body>
+
+</html>
